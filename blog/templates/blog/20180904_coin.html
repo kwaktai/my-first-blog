@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html>
+    <head>
+       <meta name="viewport" content="width=980, initial-scale=1.0,maximum-scale=2">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <style>
+            table {border-collapse: collapse}
+            td, th, {padding:5px; width:120px}
+        </style>
+        <!-- <script src="http://code.jquery.com/jquery-latest.js"></script> -->
+        <!-- <script src="https://d3js.org/d3.v4.min.js"></script> -->
+        <script src="https://code.jquery.com/jquery-1.4.4.min.js"></script>
+        <!-- <script>
+  src="https://code.jquery.com/jquery-1.11.1.js"
+</script> -->
+        <script>
+            // 전역 변수 세팅
+            var usd = 0;
+            var cny = 0;
+            var alert_array = new Array();
+            var c = 0;
+
+            function cal_usd(b) {
+              var c = usd*b ;
+              return c
+            };
+
+            // 천단위 콤마 함수
+            function numberWithCommas(x) {
+                return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+            // 숫자 외 문자열 제거 함수
+            function numberDeleteChar(x) {
+                return x.toString().replace(/[^0-9]+/g, '');
+            }
+            // 달러 환율 함수 (ajax 동기식) <2017.09.18 수정>
+            function usdkrw(){
+              usd = 1120;
+
+                // $.ajax({
+                //     type: 'GET',
+                //     async: false, //동기식 처리
+                //     url:'http://download.finance.yahoo.com/d/quotes.csv?e=.csv&f=c4l1&s=USDKRW=X',
+                //     success: function(data) {
+                //     usd = parseFloat(data.split(",")[1]); // 전역변수에 저장하여 활용
+                //     $('#USDKRW').html('환율 : $1 = \\' + usd);
+                //     }
+                // });
+            }
+            function cnykrw(){
+              cny = 168;
+
+            }
+            // 폴로닉스 함수 (환율 함수와 함께 적용되어야함)
+            function poloniex(){
+                $.get('https://poloniex.com/public?command=returnTicker', function(data) {
+                    poloniex_btc = parseFloat(data['USDT_BTC']['last']);
+                    $('#poloniex_BTC').html(' ' + numberWithCommas(Math.round(usd * poloniex_btc)));
+                    $('#poloniex_BTCUSD').html('$ ' + numberWithCommas(Math.round(poloniex_btc))); // 거래소 시세 정보 표에 값 세팅
+                    poloniex_eth = parseFloat(data['USDT_ETH']['last']);
+                    $('#poloniex_ETH').html(' ' + numberWithCommas(Math.round(usd * poloniex_eth)));
+                    poloniex_xrp = parseFloat(data['USDT_XRP']['last']);
+                    $('#poloniex_XRP').html(' ' + numberWithCommas(Math.round(usd * poloniex_xrp)));
+                    poloniex_bch = parseFloat(data['USDT_BCH']['last']);
+                    $('#poloniex_BCH').html(' ' + numberWithCommas(Math.round(usd * poloniex_bch)));
+                    poloniex_etc = parseFloat(data['USDT_ETC']['last']);
+                    $('#poloniex_ETC').html(' ' + numberWithCommas(Math.round(usd * poloniex_etc)));
+                    poloniex_bts = parseFloat(data['BTC_BTS']['last']);
+                    $('#poloniex_BTS').html(' ' + numberWithCommas(Math.round(usd * poloniex_bts)));
+
+
+
+                });
+            }
+
+            // 코인원 함수
+            // function coinone(){
+            //     $.get('https://api.coinone.co.kr/ticker?currency=all', function(data) {
+            //         coinone_btc = parseFloat(data['btc']['last']);
+            //         $('#coinone_BTC').html(' ' + numberWithCommas(coinone_btc)); // 거래소 시세 정보 표에 값 세팅
+            //         coinone_eth = parseFloat(data['eth']['last']);
+            //         $('#coinone_ETH').html(' ' + numberWithCommas(coinone_eth));
+            //         coinone_xrp = parseFloat(data['xrp']['last']);
+            //         $('#coinone_XRP').html(' ' + numberWithCommas(coinone_xrp));
+            //     });
+            // }
+
+
+            // 빗썸 함수 (크로스도메인 문제로 익스에서만 됨)
+            function bithumb(){
+                $.get('https://api.bithumb.com/public/ticker/ALL', function(data) {
+                    bithumb_btc = parseFloat(data['data']['BTC']['closing_price']);
+                    bithumb_btcusd =bithumb_btc/usd ;
+                    $('#bithumb_BTC').html(' ' + numberWithCommas(bithumb_btc));
+
+                    $('#bithumb_BTCUSD').html('$ ' + numberWithCommas(Math.round(bithumb_btcusd))); // 거래소 시세 정보 표에 값 세팅
+                    bithumb_eth = parseFloat(data['data']['ETH']['closing_price']);
+                    $('#bithumb_ETH').html(' ' + numberWithCommas(bithumb_eth));
+                    bithumb_xrp = parseFloat(data['data']['XRP']['closing_price']);
+                    $('#bithumb_XRP').html(' ' + numberWithCommas(bithumb_xrp));
+                    bithumb_qtum = parseFloat(data['data']['QTUM']['closing_price']);
+                    $('#bithumb_QTUM').html(' ' + numberWithCommas(bithumb_qtum));
+                    bithumb_eos = parseFloat(data['data']['EOS']['closing_price']);
+                    $('#bithumb_EOS').html(' ' + numberWithCommas(bithumb_eos));
+                    bithumb_etc = parseFloat(data['data']['ETC']['closing_price']);
+                    $('#bithumb_ETC').html(' ' + numberWithCommas(bithumb_etc));
+                    bithumb_bch = parseFloat(data['data']['BCH']['closing_price']);
+                    $('#bithumb_BCH').html(' ' + numberWithCommas(bithumb_bch));
+                    bithumb_test = parseFloat(data['data']['BCH']['closing_price']);
+
+                });
+            }
+
+
+//  request.onreadystatechange  = handler;
+//zb test
+function zb11(){
+  // var coin = "btc_usdt";
+  const request = new XMLHttpRequest();
+  const url = "http://api.zb.cn/data/v1/ticker?market=btc_usdt";
+  request.open("GET", url,false);
+  // request.withCredentials = true;
+  request.onreadystatechange  = nameOfTheFunction;
+  request.send();
+  var obj = JSON.parse(request.responseText);
+  var zb_btc = obj.ticker.last;
+      $('#ZB_TEST').html(zb_btc);
+        };
+
+//http://api.zb.cn/data/v1/allTicker
+          function zb11(){
+            var request = new XMLHttpRequest();
+            var url = "http://api.zb.cn/data/v1/ticker?market=btc_usdt";
+            request.open("GET", url, false);
+            // request.withCredentials = true;
+            request.onreadystatechange  = nameOfTheFunction;
+            request.send();
+            $.get('url', function(data) {
+                // data = JSON.parse(data);
+                zb_btc = data.ticker.last;
+                $('#ZB_TEST').html(zb_btc);
+              }
+              )
+              };
+//bithumb test
+    function zb11(){
+      // var coin = "BTC";
+      const request = new XMLHttpRequest();
+      const url = "https://api.bithumb.com/public/ticker/BTC";
+      request.open("GET", url,false);
+      request.withCredentials = true;
+      request.onreadystatechange  = handler;
+      request.send();
+      var obj = JSON.parse(request.responseText);
+      var zb_btc = obj.data.closing_price;
+          $('#ZB_TEST').html(zb_btc);
+        };
+
+          function zb1(){
+            $.get('http://api.zb.cn/data/v1/ticker?market=btc_usdt', function(data) {
+                data = JSON.parse(data);
+                zb_btc = parseFloat(data['date']);
+                $('#ZB_TEST').html(zb_btc);
+
+              })}
+
+          //   function zb(){
+          //     $.get('http://api.zb.com/data/v1/ticker?market=btc_usdt', function(data) {
+          //         data = JSON.parse(data);
+          //         zb_btc = parseFloat(data['ticker']['last']);
+          //         $('#zb_BTC').html(' ' + numberWithCommas(Math.round(cal_usd(zb_btc))));
+          //         $('#zb_BTCUSD').html('$ ' + numberWithCommas(Math.round(zb_btc)))});
+          //
+          //     $.get('http://api.zb.com/data/v1/ticker?market=bcc_usdt', function(data) {
+          //         data = JSON.parse(data);
+          //         zb_bch = parseFloat(data['ticker']['last']);
+          //         $('#zb_BCH').html(' ' + numberWithCommas(Math.round(cal_usd(zb_bch))))});
+          //         // $('#zb_BCH').html(' ' + numberWithCommas(Math.round(usd * zb_bch)))});
+          //
+          //     $.get('http://api.zb.com/data/v1/ticker?market=eth_usdt', function(data) {
+          //         data = JSON.parse(data);
+          //         zb_eth = parseFloat(data['ticker']['last']);
+          //         $('#zb_ETH').html(' ' + numberWithCommas(Math.round(cal_usd(zb_eth))))});
+          //     $.get('http://api.zb.com/data/v1/ticker?market=xrp_usdt', function(data) {
+          //         data = JSON.parse(data);
+          //         zb_xrp = parseFloat(data['ticker']['last']);
+          //         $('#zb_XRP').html(' ' + numberWithCommas(Math.round(cal_usd(zb_xrp))))});
+          //
+          //     $.get('http://api.zb.com/data/v1/ticker?market=etc_usdt', function(data) {
+          //         data = JSON.parse(data);
+          //         zb_etc = parseFloat(data['ticker']['last']);
+          //         $('#zb_ETC').html(' ' + numberWithCommas(Math.round(cal_usd(zb_etc))))});
+          //
+          //     $.get('http://api.zb.com/data/v1/ticker?market=qtum_usdt', function(data) {
+          //         data = JSON.parse(data);
+          //         zb_qtum = parseFloat(data['ticker']['last']);
+          //         $('#zb_QTUM').html(' ' + numberWithCommas(Math.round(cal_usd(zb_qtum))))});
+          //
+          //     $.get('http://api.zb.com/data/v1/ticker?market=eos_usdt', function(data) {
+          //         data = JSON.parse(data);
+          //         zb_eos = parseFloat(data['ticker']['last']);
+          //         $('#zb_EOS').html(' ' + numberWithCommas(Math.round(cal_usd(zb_eos))))});
+          //     $.get('http://api.zb.com/data/v1/ticker?market=bcd_usdt', function(data) {
+          //         data = JSON.parse(data);
+          //         zb_bcd = parseFloat(data['ticker']['last']);
+          //         $('#zb_BCD').html(' ' + numberWithCommas(Math.round(cal_usd(zb_btc))))});
+          //
+          //     $.get('http://api.zb.com/data/v1/ticker?market=bts_usdt', function(data) {
+          //         data = JSON.parse(data);
+          //         zb_bts = parseFloat(data['ticker']['last']);
+          //         $('#zb_BTS').html(' ' + numberWithCommas(Math.round(cal_usd(zb_bts))))});
+          //
+          // }
+
+
+// // https://crix-api-endpoint.upbit.com/v1/crix/candles/lines?code=CRIX.UPBIT.KRW-BTC
+        function upbit(){
+          $.get('https://crix-api-endpoint.upbit.com/v1/crix/candles/weeks?code=CRIX.UPBIT.BTC-QTUM', function(data) {
+            // data = JSON.parse(data);
+            upbit_btc = parseFloat(data[1]);
+            $('#upbit_BTC').html(' ' + numberWithCommas(upbit_btc))
+            });
+
+        };
+
+        function bittrex(coin) {
+            if (coin==null)
+          {
+            coin = "btc-btg";
+            coin = "eth-btg";
+          }
+          var url = "https://bittrex.com/api/v1.1/public/getmarketsummary?market="+coin;
+            var response = UrlFetchApp.fetch(url);
+            var test = response.getContentText();
+            var myjson = JSON.parse(test);
+            var value1 = myjson.result[0].Last;
+
+            var data = 123124;
+            $('#upbit_BTC').html(' ' + numberWithCommas(data))
+        };
+
+
+        function marketcap(){
+
+          $.get('https://bitflyer.jp/api/echo/price', function(data) {
+              bitflyer_btc = Math.round(parseFloat(data["mid"])/112);
+              $('#bitflyer_BTC').html('$ ' + numberWithCommas(bitflyer_btc))});
+          $.get('https://api.coinmarketcap.com/v1/global/?convert=USD', function(data) {
+              // data = JSON.parse(data);
+              marketcap_all = Math.round(parseFloat(data['total_market_cap_usd']));
+              $('#marketcap_USD').html(' $' + numberWithCommas(Math.round(marketcap_all*0.00000001)+'억'))
+              $('#marketcap_KRW').html(' ' + numberWithCommas(Math.round(marketcap_all*1120*0.000000000001))+' 조')});
+
+        };
+
+
+        // function coinest(){
+        //   $.get('https://api.coinnest.co.kr/api/pub/ticker?coin=btc', function(data) {
+        //       // data = JSON.parse(data);
+        //       coinest_btc = parseFloat(data["last"]);
+        //       // coinest_btc = 12321321321;
+        //       $('#coinest_BTC').html(' ' + numberWithCommas(coinest_btc))});
+        //   // $.get('https://api.coinnest.co.kr/api/pub/ticker?coin=btc', function(data) {
+        //   //     // data = JSON.parse(data);
+        //   //     coinest_btc = parseFloat(data["last"]);
+        //   //     // coinest_btc = 12321321321;
+        //   //     $('#coinest_BTC').html(' ' + numberWithCommas(coinest_btc))});
+        // };
+
+
+        function diff_coin(){
+          $('#diff_BTC').html(' ' +numberWithCommas(bithumb_btc-Math.round(cal_usd(zb_btc))))
+          $('#diff_BCH').html(' ' +numberWithCommas(bithumb_bch-Math.round(cal_usd(zb_bch))))
+          $('#diff_ETH').html(' ' +numberWithCommas(bithumb_eth-Math.round(cal_usd(zb_eth))))
+          $('#diff_ETC').html(' ' +numberWithCommas(bithumb_etc-Math.round(cal_usd(zb_etc))))
+          $('#diff_QTUM').html(' ' +numberWithCommas(bithumb_qtum-Math.round(cal_usd(zb_qtum))))
+          $('#diff_EOS').html(' ' +numberWithCommas(bithumb_eos-Math.round(cal_usd(zb_eos))))
+          $('#diff_XRP').html(' ' +numberWithCommas(bithumb_xrp-Math.round(cal_usd(zb_xrp))))
+          $('#diff_BTCUSA').html('$ ' +numberWithCommas(Math.round(bithumb_btcusd-poloniex_btc)))
+          $('#diff_BTCJP').html('$ ' +numberWithCommas(Math.round(bithumb_btcusd-bitflyer_btc)))
+          $('#diff_BTCCN').html('$ ' +numberWithCommas(Math.round(bithumb_btcusd-zb_btc)))
+
+
+          $('#diff_per_BTC').html(' ' + ((bithumb_btc-(usd * zb_btc))/bithumb_btc*100).toFixed(2)+"%")
+          $('#diff_per_BCH').html(' ' + ((bithumb_bch-(usd * zb_bch))/bithumb_bch*100).toFixed(2)+"%")
+          $('#diff_per_ETH').html(' ' + ((bithumb_eth-(usd * zb_eth))/bithumb_eth*100).toFixed(2)+"%")
+          $('#diff_per_ETC').html(' ' + ((bithumb_etc-(usd * zb_etc))/bithumb_etc*100).toFixed(2)+"%")
+          $('#diff_per_QTUM').html(' ' + ((bithumb_qtum-(usd * zb_qtum))/bithumb_qtum*100).toFixed(2)+"%")
+          $('#diff_per_EOS').html(' ' + ((bithumb_eos-(usd * zb_eos))/bithumb_eos*100).toFixed(2)+"%")
+          $('#diff_per_XRP').html(' ' + ((bithumb_xrp-(usd * zb_xrp))/bithumb_xrp*100).toFixed(2)+"%")
+          $('#diff_per_BTCUSA').html(' ' +((bithumb_btcusd-poloniex_btc)/bithumb_btcusd*100).toFixed(2)+"%")
+          $('#diff_per_BTCJP').html(' ' +((bithumb_btcusd-bitflyer_btc)/bithumb_btcusd*100).toFixed(2)+"%")
+          // $('#marketcap_KRW').html(' ' + numberWithCommas("???"))
+          $('#diff_per_BTCCN').html(' ' +((bithumb_btcusd-zb_btc)/bithumb_btcusd*100).toFixed(2)+"%")
+
+        btc_qty = bithumb_btc*14.33095886
+        bch_qty = bithumb_bch*0
+        qtum_qty = bithumb_qtum*7088
+        // btg_qty = zb_btg * 5.47
+        eos_qty = bithumb_eos*22450
+        bcd_qty = zb_bcd*0
+        eth_qty = bithumb_eth*0
+        etc_qty = bithumb_etc*0
+        xrp_qty = bithumb_xrp*0
+        bts_qty = poloniex_bts * bithumb_btc * 6093.84
+        ada_qty = 0
+        trx_qty = 0
+        neo_qty = 0
+        all_amo =  btc_qty+bch_qty+qtum_qty+eos_qty+bcd_qty+eth_qty+etc_qty+xrp_qty+ada_qty+trx_qty+neo_qty;
+
+        $('#qty_BTC').html(' ' +numberWithCommas(btc_qty.toFixed(0)))
+        $('#qty_BCH').html(' ' +numberWithCommas(bch_qty.toFixed(0)));
+        $('#qty_ETH').html(' ' +numberWithCommas(eth_qty.toFixed(0)));
+        $('#qty_ETC').html(' ' +numberWithCommas(etc_qty.toFixed(0)));
+        $('#qty_QTUM').html(' ' +numberWithCommas(qtum_qty.toFixed(0)));
+        $('#qty_EOS').html(' ' +numberWithCommas(eos_qty.toFixed(0)));
+        $('#qty_XRP').html(' ' +numberWithCommas(xrp_qty.toFixed(0)));
+        $('#qty_BTS').html(' ' +numberWithCommas(bts_qty.toFixed(0)));
+        $('#all_AMO').html(' ' +numberWithCommas(all_amo.toFixed(0)));
+        };
+
+            // 코빗 함수 (크로스도메인 문제로 익스에서만 됨)
+            function korbit(){
+                $.get('https://api.korbit.co.kr/v1/ticker?currency_pair=btc_krw', function(data) {
+                    data = JSON.parse(data); //json데이터로 전달 안되어 변환
+                    var korbit_btc = parseFloat(data['last']);
+                    $('#korbit_BTC').html(' ' + numberWithCommas(korbit_btc));
+                });
+                $.get('https://api.korbit.co.kr/v1/ticker?currency_pair=eth_krw', function(data) {
+                    data = JSON.parse(data); //json데이터로 전달 안되어 변환
+                    var korbit_eth = parseFloat(data['last']);
+                    $('#korbit_ETH').html(' ' + numberWithCommas(korbit_eth));
+                });
+                $.get('https://api.korbit.co.kr/v1/ticker?currency_pair=xrp_krw', function(data) {
+                    data = JSON.parse(data); //json데이터로 전달 안되어 변환
+                    var korbit_xrp = parseFloat(data['last']);
+                    $('#korbit_XRP').html(' ' + numberWithCommas(korbit_xrp));
+                });
+            }
+
+
+
+            // 알람 세팅 함수
+            function alert_setting() {
+                var selectTrade = $("#targetTrade option:selected").val(); // 선택된 거래소
+                var selectAmount = numberDeleteChar($("#targetAmount").val()); // 선택된 시세
+                var targetIf = $("#targetIf option:selected").val(); // 이상/이하
+                var tmp_array = new Array(selectTrade, selectAmount, targetIf); // 세팅 값 3개를 묶음
+                alert_array.push(tmp_array); // 세팅 값 저장
+                if(targetIf == '0')
+                    var targetIfPrint = "<font color='blue'>이하</font>";
+                else if(targetIf == '1')
+                    var targetIfPrint = "<font color='red'>이상</font>";
+                $("#alert_list").append("<li><b>"+selectTrade+"</b> 거래소의 시세가 <b>"+numberWithCommas(selectAmount)+"</b> 원 "+targetIfPrint+" 일 때 알람</li>")
+            }
+
+            // 알람 실행 함수
+            function alert_start() {
+                // 알람 배열 크기만큼 순회
+                for(var i=0; i < alert_array.length; i++) {
+                    if(typeof alert_array[i]=='undefined') continue; // 지워진 알람이면 건너뛰기
+                    var selectTrade = alert_array[i][0];
+                    var selectAmount = alert_array[i][1];
+                    var targetIf = alert_array[i][2];
+                    var currentAmount = numberDeleteChar($('#'+selectTrade).html()); // 선택된 거래소의 현재 시세
+                    var d = new Date();
+
+                    if(targetIf == '0' && parseFloat(currentAmount) <= parseFloat(selectAmount)) { // 선택된 거래소의 현재 시세가 설정 값보다 이하일때
+                        alert(selectTrade + " 거래소의 시세가 " + selectAmount + "원 이하(" + currentAmount + ")입니다.\n" + d.toString());
+                        delete(alert_array[i]); // 알람 세팅 값 삭제
+                    } else if(targetIf == '1' && parseFloat(currentAmount) >= parseFloat(selectAmount)) { // 선택된 거래소의 현재 시세가 설정 값보다 이상일때
+                        alert(selectTrade + " 거래소의 시세가 " + selectAmount + "원 이상(" + currentAmount + ")입니다.\n" + d.toString());
+                        delete(alert_array[i]); // 알람 세팅 값 삭제
+                    }
+                }
+
+                // 알람목록 갱신
+                $("#alert_list").empty();
+                for(var i=0; i < alert_array.length; i++) {
+                    if(typeof alert_array[i]=='undefined') continue; // 지워진 알람이면 건너뛰기
+                    var selectTrade = alert_array[i][0];
+                    var selectAmount = alert_array[i][1];
+                    var targetIf = alert_array[i][2];
+                    if(targetIf == '0') var targetIfPrint = "<font color='blue'>이하</font>";
+                    else if(targetIf == '1') var targetIfPrint = "<font color='red'>이상</font>";
+                    $("#alert_list").append("<li><b>"+selectTrade+"</b> 거래소의 시세가 <b>"+numberWithCommas(selectAmount)+"</b> 원 "+targetIfPrint+" 일 때 알람</li>")
+                }
+
+            }
+
+
+            // 현재 시간 갱신
+            function CurrentTime() {
+                var d = new Date();
+                $("#lastUpdate").html(d.toString());
+            }
+
+            // 갱신 함수
+            function proc() {
+                try {
+                    usdkrw(); // 환율
+                    // Market();
+                    //coinest();
+                    poloniex(); // 폴로닉스
+                    //coinone(); // 코인원
+                    bithumb(); // 빗썸
+
+                    marketcap();
+                    // zb();
+                    zb1();
+                    //upbit();
+                    diff_coin();
+                    //bittrex();
+
+                    // alert_start(); // 알람 확인
+                    CurrentTime(); // 갱신 시간
+
+
+                } catch(e){
+
+                } finally {
+                    setTimeout("proc()", 1000); //10초후 재시작
+                }
+            }
+        </script>
+        <title>Tai</title>
+    </head>
+
+    <script>
+    $(function () {
+      $('table.floating-thead>thead').each(function() {
+        $(this).after( $(this).clone().hide().css('top',0).css('position','fixed') );
+      });
+
+      $(window).scroll(function() {
+        $('table.floating-thead').each(function(i) {
+          var table = $(this),
+            thead = table.find('thead:first'),
+            clone = table.find('thead:last'),
+            top = table.offset().top,
+            bottom = top + table.height() - thead.height(),
+    		left = table.position().left,
+    		border = parseInt(thead.find('th:first').css('border-width')),
+            scroll = $(window).scrollTop();
+
+          if( scroll < top || scroll > bottom ) {
+            clone.hide();
+            return true;
+          }
+          if( clone.is('visible') ) return true;
+          clone.css('left',left).show().find('th').each(function(i) {
+            $(this).width( thead.find('th').eq(i).width() + border );
+          });
+        });
+      });
+    });
+    </script>
+    <style>
+    table { border-collapse: collapse; }
+    th { background: #cdefff; border: 2px solid silver; padding:5px; text-align:center; }
+
+    td { border: 1px solid silver; padding:5px 30px; text-align:right; }
+    tr { border: 1px solid silver; padding:5px; text-align:right; }
+
+    </style>
+
+    <style type="text/css">
+.memo {
+
+   color:blue;
+}
+</style>
+
+
+    <body onLoad="proc()">
+        <!-- 환율 정보 -->
+        <span id="USDKRW"></span>
+
+        <!-- 거래소 시세 정보 -->
+
+<table border=1 class='floating-thead'>
+  <!-- <thead> -->
+    <tr>
+
+      <th></th>
+      <th class = "memo">거래소</th>
+      <th>Premium</th>
+      <th>Percent</th>
+    </tr>
+    <tr>
+      <td>USA</td>
+      <td class = "memo" id="poloniex_BTCUSD"></td>
+      <td id="diff_BTCUSA"></td>
+      <td id="diff_per_BTCUSA"></td>
+    </tr>
+
+    <tr>
+      <td>Korea</td>
+      <td id="bithumb_BTCUSD"></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>China</td>
+      <td id="zb_BTCUSD"></td>
+      <td id="diff_BTCCN"></td>
+      <td id="diff_per_BTCCN"></td>
+    </tr>
+    <tr>
+      <td>Japen</td>
+      <td id="bitflyer_BTC"></td>
+      <td id="diff_BTCJP"></td>
+      <td id="diff_per_BTCJP"></td>
+
+    </tr>
+    <tr>
+      <td></td>
+    </tr>
+
+    <tr>
+      <td>Market Cap</td>
+      <td id="marketcap_USD"></td>
+      <td id="marketcap_KRW"></td>
+      <td id="ZB_TEST"></td>
+
+    </tr>
+
+    <tr>
+      <td></td>
+    </tr>
+
+<!-- </thead> -->
+
+
+</table>
+<style type="text/css">
+.col1{
+background-color:red
+font-color:white
+}
+
+</style>
+
+
+        <table border=1 class='floating-thead'>
+          <colgroup>
+            <col >
+            <col >
+            <col class="col1">
+            <col style="background-color:DodgerBlue;">
+            <col >
+            <col >
+            <col >
+          </colgroup>
+            <thead>
+                <th></th>
+                <th>Poloniex</th>
+                <th>ZB</th>
+                <th>빗썸</th>
+                <!-- <th>코인네스트</th> -->
+                <th>차액</th>
+                <th>차액 %</th>
+                <th>자산</th>
+          </thead>
+          <tbody>
+                <td >BTC</td>
+                <td id="poloniex_BTC"></td>
+                <td id="zb_BTC"></td>
+                <td id="bithumb_BTC"></td>
+                <!-- <td id=" "></td> -->
+                <!-- <td id="coinone_XRP"></td> -->
+                <td id="diff_BTC"></td>
+                <td id="diff_per_BTC"></td>
+                <td id="qty_BTC"></td>
+
+          </tr>
+                <tr>
+                    <td>BCH</td>
+                    <td id="poloniex_BCH"></td>
+                    <td id="zb_BCH"></td>
+                    <td id="bithumb_BCH"></td>
+                   <!-- <td id=" "></td> -->
+                    <!-- <td id="coinone_XRP"></td> -->
+                    <td id="diff_BCH"></td>
+                    <td id="diff_per_BCH"></td>
+                    <td id="qty_BCH"></td>
+
+                                    </tr>
+            <tr>
+                <td>ETH</td>
+                <td id="poloniex_ETH"></td>
+                <td id="zb_ETH"></td>
+                <td id="bithumb_ETH"></td>
+                <!-- <td id=" "></td> -->
+                <!-- <td id="coinone_XRP"></td> -->
+                <td id="diff_ETH"></td>
+                <td id="diff_per_ETH"></td>
+                <td id="qty_ETH"></td>
+
+
+            </tr>
+            <tr>
+                <td>ETC</td>
+                <td id="poloniex_ETC"></td>
+                <td id="zb_ETC"></td>
+                <td id="bithumb_ETC"></td>
+                <!-- <td id=" "></td> -->
+                <!-- <td id="coinone_XRP"></td> -->
+                <td id="diff_ETC"></td>
+                <td id="diff_per_ETC"></td>
+                <td id="qty_ETC"></td>
+
+            </tr>
+
+            <tr>
+                <td>QTUM</td>
+                <td id="poloniex_QTUM"></td>
+                <td id="zb_QTUM"></td>
+                <td id="bithumb_QTUM"></td>
+                <!-- <td id=" "></td> -->
+                <!-- <td id="coinone_XRP"></td> -->
+                <td id="diff_QTUM"></td>
+                <td id="diff_per_QTUM"></td>
+                <td id="qty_QTUM"></td>
+            </tr>
+            <tr>
+                <td>EOS</td>
+                <td id="poloniex_EOS"></td>
+                <td id="zb_EOS"></td>
+                <td id="bithumb_EOS"></td>
+                <!-- <td id=" "></td> -->
+                <!-- <td id="coinone_XRP"></td> -->
+                <td id="diff_EOS"></td>
+                <td id="diff_per_EOS"></td>
+                <td id="qty_EOS"></td>
+            </tr>
+            <tr>
+                <td>BTS</td>
+                <td id="poloniex_BTS"></td>
+                <td id="zb_BTS"></td>
+                <td id=" "></td>
+                <!-- <td id=" "></td> -->
+                <!-- <td id="coinone_XRP"></td> -->
+                <td id=" "></td>
+                <td id=" "></td>
+                <td id="qty_BTS"></td>
+            </tr>
+            <tr>
+                <td>XRP</td>
+                <td id="poloniex_XRP"></td>
+                <td id="zb_XRP"></td>
+                <td id="bithumb_XRP"></td>
+                <!-- <td id=" "></td> -->
+                <!-- <td id="coinone_XRP"></td> -->
+                <td id="diff_XRP"></td>
+                <td id="diff_per_XRP"></td>
+                <td id="qty_XRP"></td>
+            </tr>
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <td>합계</td>
+                <td id=" "></td>
+                <td id=" "></td>
+                <td id=" "></td>
+                <td id=" "></td>
+                <td id=" "></td>
+                <td id="all_AMO" style="background-color:Tomato;color:white" ></td>
+
+            </tr>
+
+            <tr>
+                <td><center>갱신 시간</center></td>
+                <td colspan="6" id="lastUpdate" align="center"></td>
+            </tr>
+
+
+          </tfoot>
+
+        </table>
+
+        <!-- 작대기 구분 -->
+        <hr>
+
+        <!-- 알람 설정 -->
+        <!-- <select id="targetTrade">
+            <option value="poloniex_BTC">폴로닉스 비트코인</option>
+            <option value="poloniex_ETH">폴로닉스 이더리움</option>
+            <option value="poloniex_XRP">폴로닉스 리플</option>
+            <option value="coinone_BTC">코인원 비트코인</option>
+            <option value="coinone_ETH">코인원 이더리움</option>
+            <option value="coinone_XRP">코인원 리플</option>
+            <option value="bithumb_BTC">빗썸 비트코인</option>
+            <option value="bithumb_ETH">빗썸 이더리움</option>
+            <option value="bithumb_XRP">빗썸 리플</option>
+            <option value="korbit_BTC">코빗 비트코인</option>
+            <option value="korbit_ETH">코빗 이더리움</option>
+            <option value="korbit_XRP">코빗 리플</option>
+        </select> 이
+        <input id="targetAmount" type="text" value="3000000"> 원
+        <select id="targetIf">
+            <option value="1">이상</option>
+            <option value="0">이하</option>
+        </select> 일때 알람
+        <input id="targetSetting" type="button" value="설정" onClick="alert_setting()"> -->
+
+        <!-- 알람 목록 -->
+        <!-- <ul id="alert_list"></ul> -->
+    </body>
+</html>
