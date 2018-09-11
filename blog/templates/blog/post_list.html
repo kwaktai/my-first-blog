@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<html>
     <head>
        <meta name="viewport" content="width=980, initial-scale=1.0,maximum-scale=2">
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -7,12 +6,8 @@
             table {border-collapse: collapse}
             td, th, {padding:5px; width:120px}
         </style>
-        <!-- <script src="http://code.jquery.com/jquery-latest.js"></script> -->
-        <!-- <script src="https://d3js.org/d3.v4.min.js"></script> -->
+        <!-- <script src="http://code.jquery.com/jquery-latest.min.js"></script> -->
         <script src="https://code.jquery.com/jquery-1.4.4.min.js"></script>
-        <!-- <script>
-  src="https://code.jquery.com/jquery-1.11.1.js"
-</script> -->
         <script>
             // 전역 변수 세팅
             var usd = 0;
@@ -74,16 +69,16 @@
             }
 
             // 코인원 함수
-            // function coinone(){
-            //     $.get('https://api.coinone.co.kr/ticker?currency=all', function(data) {
-            //         coinone_btc = parseFloat(data['btc']['last']);
-            //         $('#coinone_BTC').html(' ' + numberWithCommas(coinone_btc)); // 거래소 시세 정보 표에 값 세팅
-            //         coinone_eth = parseFloat(data['eth']['last']);
-            //         $('#coinone_ETH').html(' ' + numberWithCommas(coinone_eth));
-            //         coinone_xrp = parseFloat(data['xrp']['last']);
-            //         $('#coinone_XRP').html(' ' + numberWithCommas(coinone_xrp));
-            //     });
-            // }
+            function coinone(){
+                $.get('https://api.coinone.co.kr/ticker?currency=all', function(data) {
+                    coinone_btc = parseFloat(data['btc']['last']);
+                    $('#coinone_BTC').html(' ' + numberWithCommas(coinone_btc)); // 거래소 시세 정보 표에 값 세팅
+                    coinone_eth = parseFloat(data['eth']['last']);
+                    $('#coinone_ETH').html(' ' + numberWithCommas(coinone_eth));
+                    coinone_xrp = parseFloat(data['xrp']['last']);
+                    $('#coinone_XRP').html(' ' + numberWithCommas(coinone_xrp));
+                });
+            }
 
 
             // 빗썸 함수 (크로스도메인 문제로 익스에서만 됨)
@@ -92,7 +87,6 @@
                     bithumb_btc = parseFloat(data['data']['BTC']['closing_price']);
                     bithumb_btcusd =bithumb_btc/usd ;
                     $('#bithumb_BTC').html(' ' + numberWithCommas(bithumb_btc));
-
                     $('#bithumb_BTCUSD').html('$ ' + numberWithCommas(Math.round(bithumb_btcusd))); // 거래소 시세 정보 표에 값 세팅
                     bithumb_eth = parseFloat(data['data']['ETH']['closing_price']);
                     $('#bithumb_ETH').html(' ' + numberWithCommas(bithumb_eth));
@@ -110,59 +104,6 @@
 
                 });
             }
-
-
-//  request.onreadystatechange  = handler;
-//zb test
-function zb11(){
-  // var coin = "btc_usdt";
-  const request = new XMLHttpRequest();
-  const url = "http://api.zb.cn/data/v1/ticker?market=btc_usdt";
-  request.open("GET", url,false);
-  // request.withCredentials = true;
-  request.onreadystatechange  = nameOfTheFunction;
-  request.send();
-  var obj = JSON.parse(request.responseText);
-  var zb_btc = obj.ticker.last;
-      $('#ZB_TEST').html(zb_btc);
-        };
-
-//http://api.zb.cn/data/v1/allTicker
-          function zb11(){
-            var request = new XMLHttpRequest();
-            var url = "http://api.zb.cn/data/v1/ticker?market=btc_usdt";
-            request.open("GET", url, false);
-            // request.withCredentials = true;
-            request.onreadystatechange  = nameOfTheFunction;
-            request.send();
-            $.get('url', function(data) {
-                // data = JSON.parse(data);
-                zb_btc = data.ticker.last;
-                $('#ZB_TEST').html(zb_btc);
-              }
-              )
-              };
-//bithumb test
-    function zb11(){
-      // var coin = "BTC";
-      const request = new XMLHttpRequest();
-      const url = "https://api.bithumb.com/public/ticker/BTC";
-      request.open("GET", url,false);
-      request.withCredentials = true;
-      request.onreadystatechange  = handler;
-      request.send();
-      var obj = JSON.parse(request.responseText);
-      var zb_btc = obj.data.closing_price;
-          $('#ZB_TEST').html(zb_btc);
-        };
-
-          function zb1(){
-            $.get('http://api.zb.cn/data/v1/ticker?market=btc_usdt', function(data) {
-                data = JSON.parse(data);
-                zb_btc = parseFloat(data['date']);
-                $('#ZB_TEST').html(zb_btc);
-
-              })}
 
           //   function zb(){
           //     $.get('http://api.zb.com/data/v1/ticker?market=btc_usdt', function(data) {
@@ -254,18 +195,18 @@ function zb11(){
         };
 
 
-        // function coinest(){
-        //   $.get('https://api.coinnest.co.kr/api/pub/ticker?coin=btc', function(data) {
-        //       // data = JSON.parse(data);
-        //       coinest_btc = parseFloat(data["last"]);
-        //       // coinest_btc = 12321321321;
-        //       $('#coinest_BTC').html(' ' + numberWithCommas(coinest_btc))});
-        //   // $.get('https://api.coinnest.co.kr/api/pub/ticker?coin=btc', function(data) {
-        //   //     // data = JSON.parse(data);
-        //   //     coinest_btc = parseFloat(data["last"]);
-        //   //     // coinest_btc = 12321321321;
-        //   //     $('#coinest_BTC').html(' ' + numberWithCommas(coinest_btc))});
-        // };
+        function coinest(){
+          $.get('https://api.coinnest.co.kr/api/pub/ticker?coin=btc', function(data) {
+              // data = JSON.parse(data);
+              coinest_btc = parseFloat(data["last"]);
+              // coinest_btc = 12321321321;
+              $('#coinest_BTC').html(' ' + numberWithCommas(coinest_btc))});
+          // $.get('https://api.coinnest.co.kr/api/pub/ticker?coin=btc', function(data) {
+          //     // data = JSON.parse(data);
+          //     coinest_btc = parseFloat(data["last"]);
+          //     // coinest_btc = 12321321321;
+          //     $('#coinest_BTC').html(' ' + numberWithCommas(coinest_btc))});
+        };
 
 
         function diff_coin(){
@@ -292,13 +233,14 @@ function zb11(){
           $('#diff_per_BTCJP').html(' ' +((bithumb_btcusd-bitflyer_btc)/bithumb_btcusd*100).toFixed(2)+"%")
           // $('#marketcap_KRW').html(' ' + numberWithCommas("???"))
           $('#diff_per_BTCCN').html(' ' +((bithumb_btcusd-zb_btc)/bithumb_btcusd*100).toFixed(2)+"%")
-
+}
+        function myAssets(){
         btc_qty = bithumb_btc*14.33095886
         bch_qty = bithumb_bch*0
         qtum_qty = bithumb_qtum*7088
         // btg_qty = zb_btg * 5.47
         eos_qty = bithumb_eos*22450
-        bcd_qty = zb_bcd*0
+        bcd_qty = 0
         eth_qty = bithumb_eth*0
         etc_qty = bithumb_etc*0
         xrp_qty = bithumb_xrp*0
@@ -400,21 +342,18 @@ function zb11(){
                 try {
                     usdkrw(); // 환율
                     // Market();
-                    //coinest();
+                    // coinest();
                     poloniex(); // 폴로닉스
-                    //coinone(); // 코인원
+                    coinone(); // 코인원
                     bithumb(); // 빗썸
-
+                    myAssets();
                     marketcap();
+                    upbit();
+                    // diff_coin();
+                    bittrex();
                     // zb();
-                    zb1();
-                    //upbit();
-                    diff_coin();
-                    //bittrex();
-
                     // alert_start(); // 알람 확인
                     CurrentTime(); // 갱신 시간
-
 
                 } catch(e){
 
@@ -521,7 +460,7 @@ function zb11(){
       <td>Market Cap</td>
       <td id="marketcap_USD"></td>
       <td id="marketcap_KRW"></td>
-      <td id="ZB_TEST"></td>
+      <td id="upbit_BTC"></td>
 
     </tr>
 
